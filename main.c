@@ -3,18 +3,19 @@
 
 #include "headers.h"
 
+const int str_max = 255;
+
 int solicitar_opcion();
-void cargar_ccp(TColaCP *cola);
+void cargar_ccp(TColaCP *cola, char * nombre_archivo);
+void liberar_memoria();
 
 int main(int argc, char *argv[])
 {
-
-
-    boolean ejecutar;
+    int ejecutar;
     int opcion;
     TColaCP cola;
 
-    ejecutar = true;
+    ejecutar = TRUE;
 
     //en caso de que se haya ejecutado el programa con más o menos parámetros de los requeridos
     if (argc != 2)
@@ -32,19 +33,19 @@ int main(int argc, char *argv[])
 
             if (opcion == 1)
             {
-                cargar_ccp();
+                cargar_ccp(NULL, argv[1]);
 
                 //comportamiento específico de la opción
             }
             else if (opcion == 2)
             {
-                cargar_ccp();
+                cargar_ccp(NULL, argv[1]);
 
                 //comportamiento específico de la opción
             }
             else if (opcion == 3)
             {
-                cargar_ccp();
+                cargar_ccp(NULL, argv[1]);
 
                 //comportamiento específico de la opción
             }
@@ -53,7 +54,7 @@ int main(int argc, char *argv[])
                 liberar_memoria();
 
                 //comportamiento específico de la opción
-                ejecutar = false;
+                ejecutar = FALSE;
             }
             else
             {
@@ -74,14 +75,33 @@ int solicitar_opcion()
     printf("1. Mostrar ascendente. \n");
     printf("2. Mostrar descendente. \n");
     printf("3. Reducir horas manejo. \n");
-    printf("4. Salir. \n")
+    printf("4. Salir. \n");
 
-    scanf("%d", opcion);
+    scanf("%d", &opcion);
 
     return opcion;
 }
 
-void cargar_ccp(TColaCP *cola)
+void cargar_ccp(TColaCP *cola, char *nombre_archivo)
+{
+    FILE *file = fopen(nombre_archivo, "r");
+    char * nombre_ciudad;
+    int x, y;
+    TCiudad ciudad_usuario;
+
+    //primero guardo la posición del usuario
+    ciudad_usuario -> nombre = "usuario";
+    fscanf(file, "%f;", &(ciudad_usuario -> pos_x));     //posx
+    fscanf(file, "%f", &(ciudad_usuario -> pos_y));    //poxy
+
+    printf("Datos del usuario: \n%s, %f, %f", ciudad_usuario -> nombre,
+           ciudad_usuario -> pos_x, ciudad_usuario -> pos_y);
+
+    fclose(file);
+
+}
+
+void liberar_memoria()
 {
 
 }

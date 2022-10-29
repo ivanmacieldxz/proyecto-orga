@@ -1,0 +1,5 @@
+1;2
+Punta Alta;2;2
+Bahía Blanca;3;3
+Trenque Lauquen;1;1
+Buenos Aires;15;15

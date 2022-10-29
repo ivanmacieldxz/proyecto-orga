@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1667079127 source:c:\users\ivane\documents\proyecto-orga\main.c
+	<stdio.h>
+	<stdlib.h>
+	"headers.h"
+
+1667078006 c:\users\ivane\documents\proyecto-orga\headers.h
+
