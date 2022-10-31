@@ -2,6 +2,8 @@
 #include "headers.h"
 #include <stdlib.h>
 
+int cant_hijos(TNodo n);
+
 TColaCP crear_cola_cp(int (*f) (TEntrada, TEntrada)) {
     TColaCP cp = (TColaCP) malloc(sizeof(struct cola_con_prioridad));
 
@@ -46,8 +48,20 @@ int cp_insertar(TColaCP cola, TEntrada entrada) {
 void insertar_al_final(TColaCP cola, TNodo n) {
     TNodo actual = cola->raiz;
 
-    while (actual != NULL) {
-        if (actual)
+    //mientras el nodo actual tenga dos hijos
+    while (TRUE) {
+        
+    }
+}
+
+int cant_hijos(TNodo n) {
+    int cant = 0;
+
+    if (n->hijo_derecho != NULL) {
+        cant = 2;
+    } else if (n->hijo_izquierdo != NULL) {
+        cant = 1;
     }
 
+    return cant;
 }
