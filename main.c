@@ -8,6 +8,10 @@ const int str_max = 255;
 int solicitar_opcion();
 void cargar_ccp(TColaCP *cola, char * nombre_archivo);
 void liberar_memoria();
+int comparadorMin(TEntrada e1, TEntrada e2);
+int comparadorMax(TEntrada e1, TEntrada e2);
+TEntrada obtener_entrada(int prio, char * valor);
+int* asignar_clave();
 
 int main(int argc, char *argv[])
 {
@@ -67,7 +71,33 @@ int main(int argc, char *argv[])
 
     */
 
-   
+    TColaCP cola = crear_cola_cp(comparadorMax);
+
+    int i = 0;
+    srand(time(NULL));
+
+    while (i < 7)
+    {
+        TEntrada ent = (TEntrada) (malloc(sizeof(struct entrada)));
+
+        ent->clave = asignar_clave();
+        ent->valor = "prueba";
+
+        cp_insertar(cola, ent);
+
+        i++;
+    }
+
+
+
+    while (cola->cantidad_elementos > 0)
+    {
+        TEntrada e = cp_eliminar(cola);
+        printf("\nPrio: %d, valor:", *((int *) e->clave));
+        printf("%s", e->valor);
+    }
+
+
 
     //si se lleg� a este punto en el programa, solo se puede deber a una ejecuci�n exitosa
     return 0;
@@ -110,4 +140,39 @@ void cargar_ccp(TColaCP *cola, char *nombre_archivo)
 void liberar_memoria()
 {
 
+}
+
+int comparadorMin(TEntrada e1, TEntrada e2) {
+    int comparacion = 0;
+    int *c1 = (int *) (e1->clave);
+    int *c2 = (int *) (e2->clave);
+
+    if (*c1 < *c2) {
+        comparacion = 1;
+    } else if (*c1 > *c2) {
+        comparacion = -1;
+    }
+
+    return comparacion;
+
+}
+
+int comparadorMax(TEntrada e1, TEntrada e2) {
+    return -1 * comparadorMin(e1, e2);
+}
+
+TEntrada obtener_entrada(int prio, char * valor) {
+    TEntrada ent = malloc(sizeof(struct entrada));
+
+    ent->clave = &prio;
+    ent->valor = valor;
+
+    return ent;
+}
+
+int* asignar_clave() {
+    int * key = malloc(sizeof(int *));
+    *key = rand() % 11;
+
+    return key;
 }

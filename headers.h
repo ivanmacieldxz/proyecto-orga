@@ -39,7 +39,8 @@ typedef struct ciudad
     float pos_y;
 } * TCiudad;
 
-int crear_cola_cp(int (*f) (TEntrada, TEntrada));
-int cp_eliminar(TColaCP cola);
+TColaCP crear_cola_cp(int (*f) (TEntrada, TEntrada));
+TEntrada cp_eliminar(TColaCP cola);
 int cp_cantidad(TColaCP cola);
 int cp_destruir(TColaCP cola, void (*fEliminar) (TEntrada));
+int cp_insertar(TColaCP cola, TEntrada entrada);
