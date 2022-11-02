@@ -76,25 +76,71 @@ int main(int argc, char *argv[])
     int i = 0;
     srand(time(NULL));
 
-    while (i < 7)
-    {
-        TEntrada ent = (TEntrada) (malloc(sizeof(struct entrada)));
+    TEntrada ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
-        ent->clave = asignar_clave();
-        ent->valor = "prueba";
+    ent->clave = 1;
 
-        cp_insertar(cola, ent);
+    cp_insertar(cola, ent);
 
-        i++;
-    }
+    ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
+    ent->clave = 3;
+
+    cp_insertar(cola, ent);
+
+    ent = (TEntrada) (malloc(sizeof(struct entrada)));
+
+    ent->clave = 2;
+
+    cp_insertar(cola, ent);
+
+    ent = (TEntrada) (malloc(sizeof(struct entrada)));
+
+    ent->clave = 5;
+
+    cp_insertar(cola, ent);
+
+    ent = (TEntrada) (malloc(sizeof(struct entrada)));
+
+    ent->clave = 7;
+
+    cp_insertar(cola, ent);
+
+    ent = (TEntrada) (malloc(sizeof(struct entrada)));
+
+    ent->clave = 6;
+
+    cp_insertar(cola, ent);
+
+    ent = (TEntrada) (malloc(sizeof(struct entrada)));
+
+    ent->clave = 4;
+
+    cp_insertar(cola, ent);
+
+    ent = (TEntrada) (malloc(sizeof(struct entrada)));
+
+    ent->clave = 7;
+
+    cp_insertar(cola, ent);
+
+    ent = (TEntrada) (malloc(sizeof(struct entrada)));
+
+    ent->clave = 16;
+
+    cp_insertar(cola, ent);
+
+    ent = (TEntrada) (malloc(sizeof(struct entrada)));
+
+    ent->clave = 16;
+
+    cp_insertar(cola, ent);
 
 
     while (cola->cantidad_elementos > 0)
     {
         TEntrada e = cp_eliminar(cola);
-        printf("\nPrio: %d, valor:", *((int *) e->clave));
-        printf("%s", e->valor);
+        printf("\nPrio: %d", *((int *) e->clave));
     }
 
 

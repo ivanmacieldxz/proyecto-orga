@@ -3,10 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-void insertar_recursivamente(TColaCP cola, TNodo origen, int camino, TNodo nuevo);
-void intercambiar(TNodo n, TNodo m);
-TEntrada eliminar_recursivamente(TColaCP cola, TNodo origen, int camino);
-int cant_hijos(TNodo n);
+void insertar_recursivamente(TNodo origen, TNodo nuevo);
 
 TColaCP crear_cola_cp(int (*f) (TEntrada, TEntrada)) {
     TColaCP cp = (TColaCP) malloc(sizeof(struct cola_con_prioridad));
@@ -20,72 +17,29 @@ TColaCP crear_cola_cp(int (*f) (TEntrada, TEntrada)) {
 }
 
 int cp_insertar(TColaCP cola, TEntrada entrada) {
-    //asumo que no se pudo insertar
-    int retornar = FALSE;
+    int insertado = FALSE;
 
-    //si la entrada no es nula
     if (entrada != NULL) {
-        //creo el nodo e inicializo sus campos
+        //creo el nodo
         TNodo n = (TNodo) malloc(sizeof(struct nodo));
         n->entrada = entrada;
-        n->padre = NULL;
-        n->hijo_derecho = NULL;
-        n->hijo_izquierdo = NULL;
+        n->padre = n->hijo_derecho = n->hijo_izquierdo = NULL;
 
-
-
-        //si está vacía
-        if (cola->cantidad_elementos == 0) {
-            cola->raiz = n;//Agrega nodo como raiz de la cola
-            cola->cantidad_elementos = 1; //incrementa a uno la cantidad de elementos
-
+        if (cola->raiz == NULL) {
+            cola->raiz = n;
         } else {
-            //incremento el tamaño
-            cola->cantidad_elementos++;
-            // Encuentro la posición de inserción mediante la representación binaria del tamaño
-            int camino = 1 << (int) (floor(log2(cola->cantidad_elementos)) - 1);
-
-            insertar_recursivamente(cola, cola->raiz, camino, n);
-
+            //inserto donde corresponda en la cola, desde la raíz al nuevo nodo n creado, indicando que es la primer iteración (0)
+            insertar_recursivamente(cola->raiz, n);
         }
 
-        retornar = TRUE;
+        //incremento la cantidad de elementos de la estructura
+        cola->cantidad_elementos++;
+        
+        insertado = TRUE;
+
     }
 
-    return retornar;
-}
-
-void insertar_recursivamente(TColaCP cola, TNodo origen, int camino, TNodo nuevo) {
-    int lado = cola->cantidad_elementos & camino;
-
-    TNodo pasado;
-
-    // si el cómputo del lado no es cero (1), voy a derecha en el árbol
-    if (lado > 0) {
-        //si llegué al bit más significativo, estoy en la posición a ocupar
-        if (camino == 1)
-            origen->hijo_derecho = nuevo;
-
-        //actualizo al nodo pasado según corresponda (pasé por el hijo derecho, insertado o no)
-        pasado = origen->hijo_derecho;
-    } else {    //a izquierda
-        //idem arriba
-        if (camino == 1)
-            origen->hijo_izquierdo = nuevo;
-
-        //actualizo para que se corresponda con el hijo izquierdo (insertado nuevo o no)
-        pasado = origen->hijo_izquierdo;
-    }
-
-    //si no estoy en el bit más significativo, sigo buscando la posición de inserción con recursión, con el nodo al que acabo de pasar y el camino sin el bit más significativo (ya pasé por el nodo asociado)
-    if (camino > 1)
-        insertar_recursivamente(cola, pasado, camino >> 1, nuevo);
-
-    //si la prioridad del nodo insertado es mayor que la de su padre ()
-    if (cola->comparador(nuevo->entrada, pasado->entrada) > 0)
-        //intercambio los nodos
-        intercambiar(nuevo, pasado);
-
+    return insertado;
 }
 
 void intercambiar(TNodo n, TNodo m) {
@@ -94,87 +48,116 @@ void intercambiar(TNodo n, TNodo m) {
     m->entrada = temp;
 }
 
-/* Elimmina y retorna la entrada con mayor prioridad (menor clave) de la cola. Reacomoda la estructura heap de forma consistente.
+/* Elimina y retorna la entrada con mayor prioridad (menor clave) de la cola. Reacomoda la estructura heap de forma consistente.
 Si la cola es vacía, retorna ELE_NULO*/
 TEntrada cp_eliminar(TColaCP cola) {
-    if (cola == NULL || (cola != NULL && cola->cantidad_elementos == 0))
+    if (cola == NULL || cola->raiz == NULL)
         return ELE_NULO;
 
-    TEntrada eliminada = cola->raiz->entrada;
-    TNodo n;
+    TEntrada ent;
+    TNodo actual;
+    int cant_desc, niveles_completos, nodos_por_niveles_completos, nodos_ocupados, nodos_posibles;
 
-    if (cola->cantidad_elementos == 1) {
-        //free(cola->raiz);
-        cola->raiz == NULL;
-    } else {
-        // Encuentro la hoja a eliminar a partir de la representación binaria del tamaño  (lógica similar a la de insertar)
-        cola->raiz->entrada = eliminar_recursivamente(cola, cola->raiz, 1 << (int) (floor(log2(cola->cantidad_elementos)) - 1));
+    ent = cola->raiz->entrada;
 
-        n = cola->raiz;
+    //desde la raíz
+    actual = cola->raiz;
 
-        //llevar a la raíz hacia abajo
-        while (TRUE) {
-            TNodo min = n;
-            if (n->hijo_izquierdo != NULL && cola->comparador(n->hijo_izquierdo->entrada, min->entrada) == -1)
-                min = n->hijo_izquierdo;
-            if (n->hijo_derecho != NULL && cola->comparador(n->hijo_derecho->entrada, min->entrada) == -1)
-                min = n->hijo_derecho;
-            if (min == n) break;
+    //1. Obtengo la cantidad de descendientes de la raíz
+    cant_desc = cant_descendientes(actual);
 
-            intercambiar(n, min);
+    //2. Obtengo la cantidad de niveles completos
+    niveles_completos = (int) floor(log2(cant_desc + 1));
 
-            n = min;
-        }
+    //3. Calculo la cantidad de nodos ocupan los niveles completos y posibles
+    nodos_por_niveles_completos = (int) pow(2, niveles_completos) - 1;
+    nodos_posibles = nodos_por_niveles_completos + 1;
 
+    //4. Calculo la cantidad de nodos ocupados del siguiente nivel
+    nodos_ocupados = cant_desc - nodos_por_niveles_completos;
+
+    //5. Encuentro al nodo que será la nueva raíz
+    while (actual != NULL && cant_descendientes(actual) > 0) {
+        if (nodos_ocupados <= nodos_posibles / 2)
+            actual = actual->hijo_izquierdo;
+        else
+            actual = actual->hijo_derecho;
     }
 
+    //6. Actualizo la entrada asociada a la raíz
+    cola->raiz ->entrada = actual->entrada;
+    actual->entrada = NULL;
 
+    //7. Acomodo el heap
+    
+    
     cola->cantidad_elementos--;
 
-    return eliminada;
-}
+    //TODO: liberar el espacio ocupado por la raíz
 
-TEntrada eliminar_recursivamente(TColaCP cola, TNodo origen, int camino) {
-    int lado = cola->cantidad_elementos & camino;
-    TNodo pasado;
-
-    //si el lado es mayor a 0 (1) voy a derecha
-    if (lado > 0) {
-        pasado = origen->hijo_derecho;
-
-        //si camino = 1 estoy en el bit más significativo, por lo que llegué al nodo a eliminar
-        if (camino == 1) {
-            //libero el espacio y asigno nulo
-            //free(origen->hijo_derecho);
-            origen->hijo_derecho = NULL;
-        }
-    } else {    //sino, voy a izquierda
-        pasado = origen->hijo_izquierdo;
-
-        //idem anterior
-        if (camino == 1) {
-            //libero el espacio y asigno nulo
-            //free(origen->hijo_izquierdo);
-            origen->hijo_izquierdo = NULL;
-        }
-    }
-
-    //si llegué al final del camino, retorno la entrada del nodo que acabo de pasar, sino la que es producto de seguir con la recursión desde el nodo que acabo de pasar y descartando el bit menos significativo del camino (correspondiente al nodo que pasé)
-    return camino == 1 ? pasado->entrada : eliminar_recursivamente(cola, pasado, camino>>1);
+    return ent;
 }
 
 int cp_cantidad(TColaCP cola) {
     return cola->cantidad_elementos;
 }
 
-int cant_hijos(TNodo n) {
-    int cant = 0;
+void insertar_recursivamente(TNodo origen, TNodo nuevo) {
+    TNodo actual;
 
-    if (n->hijo_derecho != NULL) {
-        cant = 2;
-    } else if (n->hijo_izquierdo != NULL) {
-        cant = 1;
+    int niveles_completos, nodos_por_niveles_completos, nodos_posibles, nodos_ocupados;
+    int descendientes = cant_descendientes(origen);
+
+    //Caso base: el nodo origen no tiene hijos --> inserto a la izquierda
+    if (descendientes == 0) {
+        origen->hijo_izquierdo = nuevo;
+        origen->hijo_izquierdo->padre = origen;
+        //TODO: acomodar como corresponda
+    } 
+    //Caso base: el nodo origen tiene 1 hijo --> inserto a la derecha
+    else if (descendientes == 1) {
+        origen->hijo_derecho = nuevo;
+        origen->hijo_derecho->padre = origen;
+        //TODO: acomodar como corresponda
+    } 
+    //Caso recursivo: el nodo tiene 2 hijos --> se requiere un análisis más elaborado para determinar la posición de inserción
+    else {
+        //1. Calculo la cantidad de niveles completos
+
+        /* los niveles completos se corresponden con el mayor h entero que verifica 2**h - 1 <= descendientes del nodo.
+           equivalentemente: h = piso(log2(descendientes del nodo + 1)) 
+           calcularlo de la forma anterior evita iterar (aproximación inicial)*/
+        niveles_completos = (int) floor(log2(descendientes + 1));
+
+        //2. Calculo la cantidad total de nodos del siguiente nivel (posibles nodos, no existentes)
+        nodos_posibles = pow(2, niveles_completos);
+
+        //3. Calculo la cantidad de nodos ocupan los niveles completos
+        nodos_por_niveles_completos = nodos_posibles - 1;
+
+        //4. Calculo la cantidad de nodos ocupados del siguiente nivel
+        nodos_ocupados = descendientes - nodos_por_niveles_completos;
+
+        //5. Me desplazo al nodo de la izquierda o derecha según corresponda
+        if (nodos_ocupados < nodos_posibles / 2)
+            actual = origen->hijo_izquierdo;
+        else
+            actual = origen->hijo_derecho;
+        
+        //6. Recursión con el nodo actual
+        insertar_recursivamente(actual, nuevo);
+
     }
 
-    return cant;
+
+}
+
+int cant_descendientes(TNodo nodo) {
+    int cantidad = 0;
+    
+    if (nodo != NULL) {
+        cantidad = cant_descendientes(nodo->hijo_izquierdo) + cant_descendientes(nodo->hijo_derecho) + 1;
+    }
+    
+    return cantidad;
 }
