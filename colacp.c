@@ -82,7 +82,7 @@ TEntrada cp_eliminar(TColaCP cola) {
 
     //5. Encuentro al nodo que será la nueva raíz
     while (actual != NULL && cant_desc > 1) {
-        if (nodos_ocupados <= nodos_posibles / 2)   //si la cantidad de nodos ocupados del siguiente nivel es menor o igual que la mitad de nodos posibles, voy a izquierda
+        if (nodos_ocupados != 0 && (nodos_ocupados <= nodos_posibles / 2))   //si la cantidad de nodos ocupados del siguiente nivel es menor o igual que la mitad de nodos posibles, voy a izquierda
             actual = actual->hijo_izquierdo;
         else                                        //sino, voy a derecha
             actual = actual->hijo_derecho;
