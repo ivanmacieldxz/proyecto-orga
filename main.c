@@ -71,68 +71,80 @@ int main(int argc, char *argv[])
 
     */
 
-    TColaCP cola = crear_cola_cp(comparadorMax);
+    TColaCP cola = crear_cola_cp(comparadorMin);
+
+    int c1, c2, c3, c4, c5, c6, c7, c8, c9, c10;
+    c1 = 1;
+    c2 = 3;
+    c3 = 2;
+    c4 = 5;
+    c5 = 7;
+    c6 = 6;
+    c7 = 4;
+    c8 = 7;
+    c9 = 16;
+    c10 = 16;
 
     int i = 0;
     srand(time(NULL));
 
     TEntrada ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
-    ent->clave = 1;
+    ent->clave = &c1;
 
     cp_insertar(cola, ent);
 
     ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
-    ent->clave = 3;
+    ent->clave = &c2;
 
     cp_insertar(cola, ent);
 
     ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
-    ent->clave = 2;
+    ent->clave = &c3;
 
     cp_insertar(cola, ent);
 
     ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
-    ent->clave = 5;
+    ent->clave = &c4;
 
     cp_insertar(cola, ent);
 
     ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
-    ent->clave = 7;
+    ent->clave = &c5;
 
     cp_insertar(cola, ent);
 
     ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
-    ent->clave = 6;
+    ent->clave = &c6;
 
     cp_insertar(cola, ent);
 
     ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
-    ent->clave = 4;
+    ent->clave = &c7;
 
     cp_insertar(cola, ent);
 
     ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
-    ent->clave = 7;
+    ent->clave = &c8;
 
     cp_insertar(cola, ent);
 
     ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
-    ent->clave = 16;
+    ent->clave = &c9;
 
     cp_insertar(cola, ent);
 
     ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
-    ent->clave = 16;
+    ent->clave = &c10;
 
     cp_insertar(cola, ent);
 

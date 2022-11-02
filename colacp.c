@@ -4,6 +4,9 @@
 #include <math.h>
 
 void insertar_recursivamente(TNodo origen, TNodo nuevo);
+void acomodar_por_eliminacion(TColaCP cola, TNodo actual);
+int cant_hijos(TNodo n);
+int cant_descendientes(TNodo nodo);
 
 TColaCP crear_cola_cp(int (*f) (TEntrada, TEntrada)) {
     TColaCP cp = (TColaCP) malloc(sizeof(struct cola_con_prioridad));
@@ -34,7 +37,7 @@ int cp_insertar(TColaCP cola, TEntrada entrada) {
 
         //incremento la cantidad de elementos de la estructura
         cola->cantidad_elementos++;
-        
+
         insertado = TRUE;
 
     }
@@ -54,6 +57,7 @@ TEntrada cp_eliminar(TColaCP cola) {
     if (cola == NULL || cola->raiz == NULL)
         return ELE_NULO;
 
+    //auxiliares propias de la eliminación
     TEntrada ent;
     TNodo actual;
     int cant_desc, niveles_completos, nodos_por_niveles_completos, nodos_ocupados, nodos_posibles;
@@ -77,21 +81,33 @@ TEntrada cp_eliminar(TColaCP cola) {
     nodos_ocupados = cant_desc - nodos_por_niveles_completos;
 
     //5. Encuentro al nodo que será la nueva raíz
-    while (actual != NULL && cant_descendientes(actual) > 0) {
-        if (nodos_ocupados <= nodos_posibles / 2)
+    while (actual != NULL && cant_desc > 1) {
+        if (nodos_ocupados <= nodos_posibles / 2)   //si la cantidad de nodos ocupados del siguiente nivel es menor o igual que la mitad de nodos posibles, voy a izquierda
             actual = actual->hijo_izquierdo;
-        else
+        else                                        //sino, voy a derecha
             actual = actual->hijo_derecho;
+
+        //en cualquier caso:
+        //actualizo la cantidad de descendientes según la del nodo actual
+        cant_desc = cant_descendientes(actual);
+
+        //como pasé al siguiente nivel, actualizo la cantidad de niveles completos:
+        niveles_completos--;
+
+        //y actualizo los demás valores que dependían del mismo de forma acorde
+        nodos_por_niveles_completos = (int) pow(2, niveles_completos) - 1;
+        nodos_posibles = nodos_por_niveles_completos + 1;
+        nodos_ocupados = cant_desc - nodos_por_niveles_completos;
     }
 
     //6. Actualizo la entrada asociada a la raíz
-    cola->raiz ->entrada = actual->entrada;
+    cola->raiz->entrada = actual->entrada;
     actual->entrada = NULL;
 
-    //7. Acomodo el heap
-    
-    
     cola->cantidad_elementos--;
+
+    //7. Acomodar el heap desde la raíz
+    acomodar_por_eliminacion(cola, cola->raiz);
 
     //TODO: liberar el espacio ocupado por la raíz
 
@@ -109,23 +125,23 @@ void insertar_recursivamente(TNodo origen, TNodo nuevo) {
     int descendientes = cant_descendientes(origen);
 
     //Caso base: el nodo origen no tiene hijos --> inserto a la izquierda
-    if (descendientes == 0) {
+    if (descendientes == 1) {
         origen->hijo_izquierdo = nuevo;
-        origen->hijo_izquierdo->padre = origen;
+        nuevo->padre = origen;
         //TODO: acomodar como corresponda
-    } 
+    }
     //Caso base: el nodo origen tiene 1 hijo --> inserto a la derecha
-    else if (descendientes == 1) {
+    else if (descendientes == 2) {
         origen->hijo_derecho = nuevo;
-        origen->hijo_derecho->padre = origen;
+        nuevo->padre = origen;
         //TODO: acomodar como corresponda
-    } 
+    }
     //Caso recursivo: el nodo tiene 2 hijos --> se requiere un análisis más elaborado para determinar la posición de inserción
     else {
         //1. Calculo la cantidad de niveles completos
 
         /* los niveles completos se corresponden con el mayor h entero que verifica 2**h - 1 <= descendientes del nodo.
-           equivalentemente: h = piso(log2(descendientes del nodo + 1)) 
+           equivalentemente: h = piso(log2(descendientes del nodo + 1))
            calcularlo de la forma anterior evita iterar (aproximación inicial)*/
         niveles_completos = (int) floor(log2(descendientes + 1));
 
@@ -143,7 +159,7 @@ void insertar_recursivamente(TNodo origen, TNodo nuevo) {
             actual = origen->hijo_izquierdo;
         else
             actual = origen->hijo_derecho;
-        
+
         //6. Recursión con el nodo actual
         insertar_recursivamente(actual, nuevo);
 
@@ -154,10 +170,55 @@ void insertar_recursivamente(TNodo origen, TNodo nuevo) {
 
 int cant_descendientes(TNodo nodo) {
     int cantidad = 0;
-    
-    if (nodo != NULL) {
+
+    if (nodo != NULL && nodo->entrada != NULL) {
         cantidad = cant_descendientes(nodo->hijo_izquierdo) + cant_descendientes(nodo->hijo_derecho) + 1;
     }
-    
+
+    return cantidad;
+}
+
+void acomodar_por_eliminacion(TColaCP cola, TNodo actual) {
+    int hijos = cant_hijos(actual);
+
+    //Caso base: el nodo no tiene hijos: fin
+    //Caso base: el nodo tiene 1 hijo: si tiene mayor o igual prioridad que él, lo intercambio. fin
+    if (hijos == 1) {
+        if (cola->comparador(actual->hijo_izquierdo->entrada, actual->entrada) >= 0) {
+            intercambiar(actual, actual->hijo_izquierdo);
+        }
+    }
+    //Caso recursivo: el nodo tiene 2 hijos
+    else if (hijos == 2) {
+        //si el hijo izquierdo tiene mayor prioridad que el derecho
+        if (cola->comparador(actual->hijo_izquierdo->entrada, actual->hijo_derecho->entrada) >= 0) {
+            //si el padre tiene menor prioridad
+            if (cola->comparador(actual->hijo_izquierdo->entrada, actual->entrada) >= 0) {
+
+                intercambiar(actual, actual->hijo_izquierdo);
+                acomodar_por_eliminacion(cola, actual->hijo_izquierdo);
+
+            }
+        } else {    //si el hijo derecho es el de mayor prioridad
+            //si el padre tiene menor prioridad que él
+            if (cola->comparador(actual->hijo_derecho->entrada, actual->entrada) >= 0) {
+
+                intercambiar(actual, actual->hijo_derecho);
+                acomodar_por_eliminacion(cola, actual->hijo_derecho);
+
+            }
+        }
+    }
+}
+
+int cant_hijos(TNodo n) {
+    int cantidad = 0;
+
+    if (n->hijo_derecho != NULL && n->hijo_derecho->entrada != NULL) {
+        cantidad = 2;
+    } else if (n->hijo_izquierdo != NULL && n->hijo_izquierdo->entrada != NULL) {
+        cantidad = 1;
+    }
+
     return cantidad;
 }

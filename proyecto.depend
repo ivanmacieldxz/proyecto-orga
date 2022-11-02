@@ -1,12 +1,12 @@
 # depslib dependency file v1.0
-1667344125 source:c:\users\ivane\documents\proyecto-orga\main.c
+1667421709 source:c:\users\ivane\documents\proyecto-orga\main.c
 	<stdio.h>
 	<stdlib.h>
 	"headers.h"
 
 1667328131 c:\users\ivane\documents\proyecto-orga\headers.h
 
-1667332136 source:c:\users\ivane\documents\proyecto-orga\colacp.c
+1667423459 source:c:\users\ivane\documents\proyecto-orga\colacp.c
 	"headers.h"
 	<stdlib.h>
 	<math.h>
