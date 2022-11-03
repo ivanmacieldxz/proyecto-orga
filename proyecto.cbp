@@ -34,8 +34,8 @@
 		<Unit filename="colacp.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="headers.h" />
-		<Unit filename="main.c">
+		<Unit filename="colacp.h" />
+		<Unit filename="planificador.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>
