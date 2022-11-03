@@ -1,17 +1,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "headers.h"
+#include "colacp.h"
+
+#define NUM_ARGS_INV 3
+#define OPC_INV 4
+
 
 const int str_max = 255;
 
 int solicitar_opcion();
-void cargar_ccp(TColaCP *cola, char * nombre_archivo);
-void liberar_memoria();
 int comparadorMin(TEntrada e1, TEntrada e2);
 int comparadorMax(TEntrada e1, TEntrada e2);
-TEntrada obtener_entrada(int prio, char * valor);
-int* asignar_clave();
+void liberar_entrada(TEntrada entrada);
+
+typedef struct ciudad {
+    char * nombre;
+    float pos_x;
+    float pos_y;
+} * TCiudad;
 
 int main(int argc, char *argv[])
 {
@@ -57,14 +64,13 @@ int main(int argc, char *argv[])
             }
             else if (opcion == 4)
             {
-                liberar_memoria();
 
                 //comportamiento espec�fico de la opci�n
                 ejecutar = FALSE;
             }
             else
             {
-                return OPC_INV;
+                exit(OPC_INV);
             }
         }
     }
@@ -152,6 +158,29 @@ int main(int argc, char *argv[])
         printf("\nPrio: %d", *((int *) e->clave));
     }
 
+    //prueba del insertar después de eliminar (reemplaza la entrada asociada a los nodos)
+    cp_insertar(cola, ent);
+
+    ent = (TEntrada) (malloc(sizeof(struct entrada)));
+
+    ent->clave = &c9;
+    cp_insertar(cola, ent);
+
+    ent = (TEntrada) (malloc(sizeof(struct entrada)));
+
+    ent->clave = &c8;
+
+    cp_insertar(cola, ent);
+
+    ent = (TEntrada) (malloc(sizeof(struct entrada)));
+
+    ent->clave = &c2;
+
+    cp_insertar(cola, ent);
+
+
+    cp_destruir(cola, liberar_entrada);
+
     //si se lleg� a este punto en el programa, solo se puede deber a una ejecuci�n exitosa
     return 0;
 }
@@ -190,15 +219,24 @@ void cargar_ccp(TColaCP *cola, char *nombre_archivo)
 
 }
 
-void liberar_memoria()
-{
+void liberar_entrada(TEntrada entrada) {
+
+    if (entrada != NULL) {
+        /* DECOMENTAR AL TRABAJAR CON CIUDADES
+        TCiudad valor_entrada = entrada->valor;     //ciudad de la entrada
+        free(valor_entrada->nombre);        //nombre
+        free(entrada->valor);               //ciudad de la entrada
+        free(entrada->clave);               //
+        */
+        free(entrada);
+    }
 
 }
 
 int comparadorMin(TEntrada e1, TEntrada e2) {
     int comparacion = 0;
-    int *c1 = (int *) (e1->clave);
-    int *c2 = (int *) (e2->clave);
+    float *c1 = (float *) (e1->clave);
+    float *c2 = (float *) (e2->clave);
 
     if (*c1 < *c2) {
         comparacion = 1;
@@ -229,3 +267,4 @@ int* asignar_clave() {
 
     return key;
 }
+

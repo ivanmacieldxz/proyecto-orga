@@ -11,15 +11,22 @@
 	<stdlib.h>
 	<math.h>
 
-1667440800 source:c:\users\iván\documents\codeblocks projects\proyecto\main.c
+1667442315 source:c:\users\iván\documents\codeblocks projects\proyecto\main.c
 	<stdio.h>
 	<stdlib.h>
 	"headers.h"
 
-1667351066 c:\users\iván\documents\codeblocks projects\proyecto\headers.h
+1667449527 c:\users\iván\documents\codeblocks projects\proyecto\headers.h
 
-1667441384 source:c:\users\iván\documents\codeblocks projects\proyecto\colacp.c
-	"headers.h"
+1667454501 source:c:\users\iván\documents\codeblocks projects\proyecto\colacp.c
+	"colacp.h"
 	<stdlib.h>
 	<math.h>
+
+1667450062 c:\users\iván\documents\codeblocks projects\proyecto\colacp.h
+
+1667455090 source:c:\users\iván\documents\codeblocks projects\proyecto\planificador.c
+	<stdio.h>
+	<stdlib.h>
+	"colacp.h"
 
