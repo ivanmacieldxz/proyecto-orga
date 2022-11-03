@@ -85,24 +85,9 @@ int main(int argc, char *argv[])
     c9 = 16;
     c10 = 16;
 
-    int i = 0;
-    srand(time(NULL));
-
     TEntrada ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
-    ent->clave = &c1;
-
-    cp_insertar(cola, ent);
-
-    ent = (TEntrada) (malloc(sizeof(struct entrada)));
-
-    ent->clave = &c2;
-
-    cp_insertar(cola, ent);
-
-    ent = (TEntrada) (malloc(sizeof(struct entrada)));
-
-    ent->clave = &c3;
+    ent->clave = &c10;
 
     cp_insertar(cola, ent);
 
@@ -114,7 +99,19 @@ int main(int argc, char *argv[])
 
     ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
+    ent->clave = &c7;
+
+    cp_insertar(cola, ent);
+
+    ent = (TEntrada) (malloc(sizeof(struct entrada)));
+
     ent->clave = &c5;
+
+    cp_insertar(cola, ent);
+
+    ent = (TEntrada) (malloc(sizeof(struct entrada)));
+
+    ent->clave = &c2;
 
     cp_insertar(cola, ent);
 
@@ -126,7 +123,7 @@ int main(int argc, char *argv[])
 
     ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
-    ent->clave = &c7;
+    ent->clave = &c1;
 
     cp_insertar(cola, ent);
 
@@ -144,7 +141,7 @@ int main(int argc, char *argv[])
 
     ent = (TEntrada) (malloc(sizeof(struct entrada)));
 
-    ent->clave = &c10;
+    ent->clave = &c3;
 
     cp_insertar(cola, ent);
 
@@ -154,8 +151,6 @@ int main(int argc, char *argv[])
         TEntrada e = cp_eliminar(cola);
         printf("\nPrio: %d", *((int *) e->clave));
     }
-
-
 
     //si se lleg� a este punto en el programa, solo se puede deber a una ejecuci�n exitosa
     return 0;
